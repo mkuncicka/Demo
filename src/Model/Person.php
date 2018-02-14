@@ -52,4 +52,9 @@ class Person
         return $result;
     }
 
+    public function getFullName()
+    {
+        return $this->firstName . ' ' . $this->lastName;
+    }
+
 }

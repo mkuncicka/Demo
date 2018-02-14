@@ -12,9 +12,17 @@ use Demo\Model\Person;
 interface Persons
 {
     /**
-     * Returns array of Person object
+     * Returns array of Person objects
      *
      * @return Person[]
      */
     public function getAll();
+
+    /**
+     * Returns array of Person objects matching given name
+     *
+     * @param $name
+     * @return Person[]
+     */
+    public function getByName($name);
 }

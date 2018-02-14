@@ -38,6 +38,24 @@ class PersonsRepository implements Persons
         return $this->serialize($persons, $languages);
     }
 
+    /**
+     * Returns array of Person objects matching given name
+     * @param $name
+     * @return Person[]
+     */
+    public function getByName($name)
+    {
+        $result = [];
+        $allPersons = $this->getAll();
+        foreach ($allPersons as $person) {
+            if (strpos($person->getFullName(), $name) !== false) {
+                $result[] = $person;
+            }
+        }
+
+        return $result;
+    }
+
     private function serialize(array $persons, $languages)
     {
         $result = [];
