@@ -1,0 +1,35 @@
+{
+  "person": [
+    {
+      "id": 1,
+      "firstName": "Jan",
+      "LatName": "Kowalski"
+    },
+    {
+      "id": 2,
+      "firstName": "Anna",
+      "LatName": "Nowak"
+    }
+  ],
+  "language": [
+    {
+      "name": "PHP"
+    },
+    {
+      "name": "Java"
+    },
+    {
+      "name": "C++"
+    }
+  ],
+  "person_language": [
+    {
+      "personId": 1,
+      "languages": ["PHP", "Java"]
+    },
+    {
+      "personId": 2,
+      "languages": ["Java"]
+    }
+  ]
+}
