@@ -2,6 +2,8 @@
 
 namespace Demo\Repository;
 
+use Demo\Model\Person;
+
 /**
  * Describes Persons repository
  *
@@ -9,5 +11,10 @@ namespace Demo\Repository;
  */
 interface Persons
 {
-
+    /**
+     * Returns array of Person object
+     *
+     * @return Person[]
+     */
+    public function getAll();
 }
