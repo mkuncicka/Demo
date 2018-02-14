@@ -56,6 +56,42 @@ class PersonsRepository implements Persons
         return $result;
     }
 
+    /**
+     * Returns array of Person objects witch knows given languages
+     *
+     * @param array $languagesNames
+     * @return Person[]
+     */
+    public function getByLanguages(array $languagesNames)
+    {
+        $result = [];
+        $allPersons = $this->getAll();
+
+        foreach ($allPersons as $person) {
+            $personLanguages = array_map(
+                function ($language) {
+                    return strtolower($language);
+                },
+                $person->getLanguages()
+            );
+
+            $hasAllLanguages = true;
+
+            foreach ($languagesNames as $language) {
+                if (!in_array(strtolower($language), $personLanguages)) {
+                    $hasAllLanguages = false;
+                    break;
+                }
+            }
+
+            if ($hasAllLanguages) {
+                $result[] = $person;
+            }
+        }
+
+        return $result;
+    }
+
     private function serialize(array $persons, $languages)
     {
         $result = [];

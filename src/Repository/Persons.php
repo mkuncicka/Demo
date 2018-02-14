@@ -25,4 +25,12 @@ interface Persons
      * @return Person[]
      */
     public function getByName($name);
+
+    /**
+     * Returns array of Person objects witch knows given languages
+     *
+     * @param array $languagesNames
+     * @return Person[]
+     */
+    public function getByLanguages(array $languagesNames);
 }

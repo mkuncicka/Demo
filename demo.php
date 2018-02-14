@@ -10,6 +10,7 @@ echo $function($arguments);
 function _list() {
     $dbManager = new Demo\Database\JsonDatabaseManager();
     $personsRepository = new \Demo\Repository\PersonsRepository($dbManager);
+
     foreach ($personsRepository->getAll() as $person) {
         print $person;
     }
@@ -25,7 +26,17 @@ function _find($args) {
     $name = implode( ' ', $args);
     $dbManager = new Demo\Database\JsonDatabaseManager();
     $personsRepository = new \Demo\Repository\PersonsRepository($dbManager);
+
     foreach ($personsRepository->getByName($name) as $person) {
+        print $person;
+    }
+}
+
+function _languages($args) {
+    $dbManager = new Demo\Database\JsonDatabaseManager();
+    $personsRepository = new \Demo\Repository\PersonsRepository($dbManager);
+
+    foreach ($personsRepository->getByLanguages($args) as $person) {
         print $person;
     }
 }

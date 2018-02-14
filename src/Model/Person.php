@@ -57,4 +57,9 @@ class Person
         return $this->firstName . ' ' . $this->lastName;
     }
 
+    public function getLanguages()
+    {
+        return $this->languages;
+    }
+
 }
