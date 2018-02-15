@@ -45,8 +45,16 @@ class Application
         $this->commandHandler = new CommandHandler($this->databaseManager, $this->persons, $this->languages, $this->validator);
     }
 
-    public function handleCommand($argv)
+    /**
+     * Handles command typed by user
+     *
+     * @param array $argv
+     */
+    public function handleCommand(array $argv)
     {
+        if (count($argv) <= 1) {
+            return;
+        }
         $function = $argv[1];
         $arguments = array_slice($argv, 2);
 

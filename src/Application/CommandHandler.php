@@ -111,8 +111,6 @@ class CommandHandler
 
         $person = new Person($firstName, $lastName, $languages);
         $this->persons->add($person);
-
-        print "Person addition succeed\n";
     }
 
     /**
@@ -129,8 +127,6 @@ class CommandHandler
 
         $language = new Language($languageName);
         $this->languages->add($language);
-
-        print "Language addition succeed\n";
     }
 
     /**
@@ -149,8 +145,6 @@ class CommandHandler
             throw new NotFoundException();
         }
         $this->persons->remove($person);
-
-        print "Person deletion succeed\n";
     }
 
     /**
@@ -168,8 +162,6 @@ class CommandHandler
         }
 
         $this->languages->remove($language);
-
-        print "Language deletion succeed\n";
     }
 
     public function __call($name, $arguments)
