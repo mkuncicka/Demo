@@ -72,4 +72,17 @@ function _addLanguage($args) {
     }
 }
 
+function _removePerson($args) {
+    $dbManager = new Demo\Database\JsonDatabaseManager();
+    $personsRepository = new \Demo\Repository\PersonsRepository($dbManager);
+
+    try {
+        $personsRepository->removeById($args[0]);
+        print "Person addition succeed\n";
+    } catch (\Exception $e) {
+        print "Person addition faild. Message: " . $e->getMessage() . "\n";
+        print "Trace: \n" . json_encode($e->getTrace()) . "\n";
+    }
+}
+
 ?>

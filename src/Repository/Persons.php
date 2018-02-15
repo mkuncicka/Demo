@@ -41,4 +41,12 @@ interface Persons
      * @return void
      */
     public function add(Person $person);
+
+    /**
+     * Removes person from repository
+     *
+     * @param $id
+     * @return void
+     */
+    public function removeById($id);
 }

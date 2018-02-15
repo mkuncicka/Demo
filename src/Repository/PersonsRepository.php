@@ -126,4 +126,15 @@ class PersonsRepository implements Persons
 
         return $result;
     }
+
+    /**
+     * Removes person from repository
+     *
+     * @param $id
+     * @return void
+     */
+    public function removeById($id)
+    {
+        $this->databaseManager->removePerson($id);
+    }
 }

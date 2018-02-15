@@ -21,8 +21,16 @@ interface DatabaseManager
      * Persists entity to database
      *
      * @param $entity
-     * @return mixed
+     * @return void
      */
     public function persist($entity);
+
+    /**
+     * Removes person identified by given id
+     * 
+     * @param $id
+     * @return void
+     */
+    public function removePerson($id);
 
 }

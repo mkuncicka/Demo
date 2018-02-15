@@ -42,6 +42,31 @@ class JsonDatabaseManager implements DatabaseManager
         }
     }
 
+    /**
+     * Removes person identified by given id
+     *
+     * @param $id
+     * @return void
+     */
+    public function removePerson($id)
+    {
+        $db = $this->getDatabase();
+        $persons = $db['person'];
+        $personLanguages = $db['person_language'];
+        foreach ($persons as $personKey=>$person) {
+            if ($person['id'] === (int) $id) {
+                $db['person'] = array_splice($persons, $personKey, 1);
+                foreach ($personLanguages as $languageKey=>$personLanguage) {
+                    if ($personLanguage['personId'] === (int) $id) {
+                        $db['person_language'] = array_slice($personLanguages, $languageKey, 1);
+                    }
+                }
+            }
+        }
+
+        $this->updateDb($persons);
+    }
+
     private function getDatabase()
     {
         return json_decode(file_get_contents(Parameters::DB_PATH), true);
