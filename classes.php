@@ -12,3 +12,5 @@ require_once "src/Repository/Languages.php";
 require_once "src/Repository/LanguagesRepository.php";
 require_once "src/Repository/Persons.php";
 require_once "src/Repository/PersonsRepository.php";
+require_once "src/Application/Application.php";
+require_once "src/Application/CommandHandler.php";
