@@ -162,16 +162,11 @@ class JsonDatabaseManager implements DatabaseManager
         $existingLanguages = $db['language'];
         $personLanguages = $db['person_language'];
 
-        $personIds = array_map(
-            function ($person) {
-                return $person['id'];
-            },
-            $persons);
+        $id = $db['last_inserted_person_id'] + 1;
 
-        $id = count($personIds) > 0 ? max($personIds) + 1 : 1;
-
-        $personToPersist = $this->mapPersonToDbType($person, $id);
-        $personLanguagesToPersist = $this->mapPersonLanguagesToDbType($person, $existingLanguages);
+        $personToPersist = $this->createPersonDbRecord($person, $id);
+        $personLanguagesToPersist = $this->createPersonLanguagesRecord($person);
+        $existingLanguages = $this->updateLanguagesDbRecordsWithPersonLanguages($person, $existingLanguages);
 
         $personLanguages[] = [
             'personId' => $id,
@@ -183,7 +178,8 @@ class JsonDatabaseManager implements DatabaseManager
         $updatedDb = [
             'person' => $persons,
             'language' => $existingLanguages,
-            'person_language' => $personLanguages
+            'person_language' => $personLanguages,
+            'last_inserted_person_id' => $id
         ];
 
         $this->updateDb($updatedDb);
@@ -203,7 +199,13 @@ class JsonDatabaseManager implements DatabaseManager
         $this->updateDb($db);
     }
 
-    private function mapPersonToDbType(Person $person, $id)
+    /**
+     * Creates person record from new Person entity with given id
+     * @param Person $person
+     * @param $id
+     * @return array
+     */
+    private function createPersonDbRecord(Person $person, $id)
     {
         $reflectionClass = new \ReflectionClass(Person::class);
         $reflectionFirstName = $reflectionClass->getProperty('firstName');
@@ -218,10 +220,32 @@ class JsonDatabaseManager implements DatabaseManager
         ];
     }
 
-    private function mapPersonLanguagesToDbType(Person $person, &$existingLanguages)
+    /**
+     * Creates person_language record from new Person entity
+     *
+     * @param Person $person
+     * @return array
+     */
+    private function createPersonLanguagesRecord(Person $person)
     {
         $personLanguagesToPersist = [];
 
+        foreach ($person->getLanguages() as $language) {
+            $personLanguagesToPersist[] = $language->getName();
+        }
+
+        return $personLanguagesToPersist;
+    }
+
+    /**
+     * Updates language records with new languages persisted with person
+     *
+     * @param Person $person
+     * @param array $existingLanguages
+     * @return array
+     */
+    private function updateLanguagesDbRecordsWithPersonLanguages(Person $person, array $existingLanguages)
+    {
         $languageNames = array_map(
             function ($language) {
                 return $language['name'];
@@ -234,10 +258,10 @@ class JsonDatabaseManager implements DatabaseManager
                 $existingLanguages[] = ['name' => $name];
             }
 
-            $personLanguagesToPersist[] = $name;
         }
 
-        return $personLanguagesToPersist;
+        return $existingLanguages;
+
     }
 
     /**
