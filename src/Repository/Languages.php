@@ -2,6 +2,8 @@
 
 namespace Demo\Repository;
 
+use Demo\Model\Language;
+
 /**
  * Describes Languages Repository
  *
@@ -9,5 +11,11 @@ namespace Demo\Repository;
  */
 interface Languages
 {
-
+    /**
+     * Adds language to repository
+     *
+     * @param Language $language
+     * @return void
+     */
+    public function add(Language $language);
 }

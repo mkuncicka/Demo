@@ -31,14 +31,12 @@ class Person
 
     /**
      * Person constructor.
-     * @param int $id
      * @param string $firstName
      * @param string $lastName
      * @param Language[] $languages
      */
-    public function __construct(int $id, string $firstName, string $lastName, array $languages)
+    public function __construct(string $firstName, string $lastName, array $languages)
     {
-        $this->id = $id;
         $this->firstName = $firstName;
         $this->lastName = $lastName;
         $this->languages = $languages;

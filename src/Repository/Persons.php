@@ -33,4 +33,12 @@ interface Persons
      * @return Person[]
      */
     public function getByLanguages(array $languagesNames);
+
+    /**
+     * Adds Person to database
+     *
+     * @param Person $person
+     * @return void
+     */
+    public function add(Person $person);
 }

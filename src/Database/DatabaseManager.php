@@ -17,4 +17,12 @@ interface DatabaseManager
      */
     public function getTableContest(string $tableName);
 
+    /**
+     * Persists entity to database
+     *
+     * @param $entity
+     * @return mixed
+     */
+    public function persist($entity);
+
 }

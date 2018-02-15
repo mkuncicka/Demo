@@ -92,6 +92,17 @@ class PersonsRepository implements Persons
         return $result;
     }
 
+    /**
+     * Adds Person to database
+     *
+     * @param Person $person
+     * @return void
+     */
+    public function add(Person $person)
+    {
+        $this->databaseManager->persist($person);
+    }
+
     private function serialize(array $persons, $languages)
     {
         $result = [];
@@ -104,7 +115,13 @@ class PersonsRepository implements Persons
         foreach ($persons as $item) {
             $id = $item['id'];
 
-            $result[] = new Person($id, $item['firstName'], $item['lastName'], $personLanguages[$id]);
+            $person = new Person($item['firstName'], $item['lastName'], $personLanguages[$id]);
+            $reflectionClass = new \ReflectionClass(Person::class);
+            $reflectionProperty = $reflectionClass->getProperty('id');
+            $reflectionProperty->setAccessible(true);
+            $reflectionProperty->setValue($person, $id);
+
+            $result[] = $person;
         }
 
         return $result;

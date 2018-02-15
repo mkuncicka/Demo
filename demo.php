@@ -41,4 +41,35 @@ function _languages($args) {
     }
 }
 
+function _addPerson($args) {
+
+    $dbManager = new Demo\Database\JsonDatabaseManager();
+    $personsRepository = new \Demo\Repository\PersonsRepository($dbManager);
+    $languages = [];
+    try {
+        foreach (array_splice($args, 2) as $languageName) {
+            $languages[] = new \Demo\Model\Language($languageName);
+        }
+        $person = new \Demo\Model\Person($args[0], $args[1], $languages);
+        $personsRepository->add($person);
+        print "Person addition succeed\n";
+    } catch (\Exception $e) {
+        print "Person addition faild. Message: " . $e->getMessage() . "\n";
+        print "Trace: \n" . json_encode($e->getTrace()) . "\n";
+    }
+}
+
+function _addLanguage($args) {
+    try {
+        $dbManager = new Demo\Database\JsonDatabaseManager();
+        $languagesRepository = new \Demo\Repository\LanguagesRepository($dbManager);
+        $language = new \Demo\Model\Language($args[0]);
+        $languagesRepository->add($language);
+        print "Language addition succeed\n";
+    } catch (\Exception $e) {
+        print "Language addition faild. Message: " . $e->getMessage() . "\n";
+        print "Trace: \n" . json_encode($e->getTrace()) . "\n";
+    }
+}
+
 ?>
