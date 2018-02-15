@@ -79,6 +79,13 @@ class Validator
         return true;
     }
 
+    /**
+     * Validates if the array has at least expected number of elements
+     *
+     * @param array $argument
+     * @param int $minCount
+     * @throws ValidationException
+     */
     public function hasMinimumNumberOfElements(array $argument, int $minCount)
     {
         if (count($argument) < $minCount) {

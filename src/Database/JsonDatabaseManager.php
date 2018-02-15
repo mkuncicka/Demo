@@ -40,6 +40,7 @@ class JsonDatabaseManager implements DatabaseManager
             throw new UnsupportedEntity();
         }
     }
+
     /**
      * @inheritdoc
      */
@@ -89,7 +90,7 @@ class JsonDatabaseManager implements DatabaseManager
      * @param Person $person
      * @return void
      */
-    public function removePerson(Person $person)
+    private function removePerson(Person $person)
     {
         $reflectionClass = new \ReflectionClass(Person::class);
         $reflectionProperty = $reflectionClass->getProperty('id');
@@ -152,6 +153,8 @@ class JsonDatabaseManager implements DatabaseManager
     }
 
     /**
+     * Persists person into database
+     *
      * @param Person $person
      */
     private function persistPerson(Person $person)
@@ -185,6 +188,12 @@ class JsonDatabaseManager implements DatabaseManager
         $this->updateDb($updatedDb);
     }
 
+    /**
+     * Persists language into database
+     *
+     * @param Language $language
+     * @throws LanguageAlreadyExists
+     */
     private function persistLanguage(Language $language)
     {
         if ($this->languageExists($language)) {
@@ -201,6 +210,7 @@ class JsonDatabaseManager implements DatabaseManager
 
     /**
      * Creates person record from new Person entity with given id
+     *
      * @param Person $person
      * @param $id
      * @return array
@@ -302,6 +312,7 @@ class JsonDatabaseManager implements DatabaseManager
     }
 
     /**
+     * Creates Persons from db records
      * @param array $persons
      * @param array $personsLanguages
      * @return array
@@ -331,6 +342,8 @@ class JsonDatabaseManager implements DatabaseManager
     }
 
     /**
+     * Creates Languages from db records
+     *
      * @param array $languages
      * @return array
      */
@@ -345,6 +358,14 @@ class JsonDatabaseManager implements DatabaseManager
         return $result;
     }
 
+    /**
+     * Filters result by given filters
+     *
+     * @param array $items
+     * @param array $filters
+     * @param bool $caseSensitive
+     * @return array
+     */
     private function filterResult(array $items, array $filters, bool $caseSensitive = true)
     {
         $result = [];
