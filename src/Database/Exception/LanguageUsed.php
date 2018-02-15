@@ -10,7 +10,7 @@ namespace Demo\Database;
 class LanguageUsed extends \Exception
 {
     public function __construct(
-        $message = "Language you tried to deleted is in use - check relations id database",
+        $message = "Language you tried to deleted is in use - check relations in database",
         $code = 0,
         \Throwable $previous = null)
     {

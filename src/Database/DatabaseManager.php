@@ -2,8 +2,6 @@
 
 namespace Demo\Database;
 
-use Demo\Model\Language;
-
 /**
  * Describes database manager implementation
  *
@@ -11,14 +9,6 @@ use Demo\Model\Language;
  */
 interface DatabaseManager
 {
-    /**
-     * Returns table with the given name
-     *
-     * @param string $tableName
-     * @return array
-     */
-    public function getTableContest(string $tableName);
-
     /**
      * Persists entity to database
      *
@@ -28,19 +18,29 @@ interface DatabaseManager
     public function persist($entity);
 
     /**
-     * Removes person identified by given id
+     * Removes entity from database
      *
-     * @param $id
+     * @param $entity
      * @return void
      */
-    public function removePerson($id);
+    public function remove($entity);
 
     /**
-     * Removes language identified by given name
+     * Returns all data of given type filtered by given fields
      *
-     * @param Language $language
-     * @return void
+     * @param string $entityClassName
+     * @param array $filters
+     * @param bool $caseSensitive
+     * @return array
      */
-    public function removeLanguage(Language $language);
+    public function getAll(string $entityClassName, array $filters = [], bool $caseSensitive = true);
+
+    /**
+     * Returns single entity identified by id
+     *
+     * @param string $entityClassName
+     * @param int $id
+     */
+    public function getOneById(string $entityClassName, int $id);
 
 }

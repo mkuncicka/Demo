@@ -20,21 +20,29 @@ class Application
      * @var DatabaseManager
      */
     private $databaseManager;
+
     /**
      * @var Languages
      */
     private $languages;
+
     /**
      * @var Persons
      */
     private $persons;
+
+    /**
+     * @var Validator
+     */
+    private $validator;
 
     public function __construct()
     {
         $this->databaseManager = new JsonDatabaseManager();
         $this->languages = new LanguagesRepository($this->databaseManager);
         $this->persons = new PersonsRepository($this->databaseManager);
-        $this->commandHandler = new CommandHandler($this->databaseManager, $this->persons, $this->languages);
+        $this->validator = new Validator();
+        $this->commandHandler = new CommandHandler($this->databaseManager, $this->persons, $this->languages, $this->validator);
     }
 
     public function handleCommand($argv)

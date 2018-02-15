@@ -2,6 +2,7 @@
 
 namespace Demo\Application;
 
+use Demo\Application\Exception\NotFoundException;
 use Demo\Database\DatabaseManager;
 use Demo\Model\Language;
 use Demo\Model\Person;
@@ -136,10 +137,18 @@ class CommandHandler
      * Initialize removal of the Person from database
      *
      * @param $args
+     * @throws NotFoundException
      */
     public function removePerson($args)
     {
-        $this->persons->removeById($args[0]);
+        $this->validator->notAnEmptyArray($args);
+
+        $person = $this->persons->getById($args[0]);
+
+        if ($person === null) {
+            throw new NotFoundException();
+        }
+        $this->persons->remove($person);
 
         print "Person deletion succeed\n";
     }
@@ -148,12 +157,23 @@ class CommandHandler
      * Initialize removal of the Language from database
      *
      * @param $args
+     * @throws NotFoundException
      */
     public function removeLanguage($args)
     {
-        $language = new Language($args[0]);
+        $language = $this->languages->getByName($args[0]);
+
+        if ($language === null) {
+            throw new NotFoundException();
+        }
+
         $this->languages->remove($language);
 
         print "Language deletion succeed\n";
+    }
+
+    public function __call($name, $arguments)
+    {
+        print "Method $name not implemented.\n";
     }
 }

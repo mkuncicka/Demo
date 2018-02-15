@@ -35,6 +35,14 @@ interface Persons
     public function getByLanguages(array $languagesNames);
 
     /**
+     * Returns Person identified by given ID
+     *
+     * @param int $id
+     * @return Person
+     */
+    public function getById(int $id);
+
+    /**
      * Adds Person to database
      *
      * @param Person $person
@@ -45,8 +53,8 @@ interface Persons
     /**
      * Removes person from repository
      *
-     * @param $id
+     * @param Person $person
      * @return void
      */
-    public function removeById($id);
+    public function remove(Person $person);
 }

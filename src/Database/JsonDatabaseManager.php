@@ -14,22 +14,7 @@ use Demo\Model\Person;
 class JsonDatabaseManager implements DatabaseManager
 {
     /**
-     * Returns table with the given name
-     *
-     * @param string $tableName
-     * @return array
-     */
-    public function getTableContest(string $tableName)
-    {
-        return $this->getDatabase()[$tableName];
-    }
-
-    /**
-     * Persists entity to database
-     *
-     * @param $entity
-     * @return mixed
-     * @throws UnsupportedEntity
+     * @inheritdoc
      */
     public function persist($entity)
     {
@@ -43,39 +28,105 @@ class JsonDatabaseManager implements DatabaseManager
     }
 
     /**
-     * Removes person identified by given id
+     * @inheritdoc
+     */
+    public function remove($entity)
+    {
+        if ($entity instanceof Person) {
+            $this->removePerson($entity);
+        } elseif ($entity instanceof Language) {
+            $this->removeLanguage($entity);
+        } else {
+            throw new UnsupportedEntity();
+        }
+    }
+    /**
+     * @inheritdoc
+     */
+    public function getAll(string $entityClassName, array $filters = [], bool $caseSensitive = true)
+    {
+        if ($entityClassName === Person::class) {
+            $persons = $this->getTableContest('person');
+            $personsLanguages = $this->getTableContest('person_language');
+
+            $result =  $this->createPersonsFromDbType($persons, $personsLanguages);
+
+        } elseif ($entityClassName === Language::class) {
+            $languages = $this->getTableContest('language');
+
+            $result = $this->createLanguagesFromDbType($languages);
+        } else {
+            throw new UnsupportedEntity();
+        }
+
+        if (!empty($filters)) {
+            $result = $this->filterResult($result, $filters, $caseSensitive);
+        }
+
+        return $result;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getOneById(string $entityClassName, int $id)
+    {
+        if ($entityClassName !== Person::class) {
+            throw new UnsupportedEntity("Entity you are trying to fetch does not have id");
+        }
+
+        $result = $this->getAll(Person::class, ['id' => $id]);
+        if (count($result) > 1) {
+            throw new \PDOException("Multiply records identified by given ID");
+        }
+
+        return !empty($result) ? $result[0] : null;
+    }
+
+    /**
+     * Removes person from database
      *
-     * @param $id
+     * @param Person $person
      * @return void
      */
-    public function removePerson($id)
+    public function removePerson(Person $person)
     {
+        $reflectionClass = new \ReflectionClass(Person::class);
+        $reflectionProperty = $reflectionClass->getProperty('id');
+        $reflectionProperty->setAccessible(true);
+        $id = $reflectionProperty->getValue($person);
+
         $db = $this->getDatabase();
         $persons = $db['person'];
         $personLanguages = $db['person_language'];
+
         foreach ($persons as $personKey=>$person) {
             if ($person['id'] === (int) $id) {
-                $db['person'] = array_splice($persons, $personKey, 1);
+                array_splice($persons, $personKey, 1);
+
                 foreach ($personLanguages as $languageKey=>$personLanguage) {
                     if ($personLanguage['personId'] === (int) $id) {
-                        $db['person_language'] = array_splice($personLanguages, $languageKey, 1);
+                        array_splice($personLanguages, $languageKey, 1);
                     }
                 }
             }
         }
 
-        $this->updateDb($persons);
+        $db['person'] = $persons;
+        $db['person_language'] = $personLanguages;
+
+        $this->updateDb($db);
     }
 
     /**
      * Removes language identified by given name
      *
      * @param Language $language
-     * @return mixed
+     * @return void
      * @throws LanguageNotFound
      * @throws LanguageUsed
      */
-    public function removeLanguage(Language $language)
+    private function removeLanguage(Language $language)
     {
         if ($this->languageExists($language) === false) {
             throw new LanguageNotFound();
@@ -100,11 +151,6 @@ class JsonDatabaseManager implements DatabaseManager
         $this->updateDb($db);
     }
 
-    private function getDatabase()
-    {
-        return json_decode(file_get_contents(Parameters::DB_PATH), true);
-    }
-
     /**
      * @param Person $person
      */
@@ -124,8 +170,8 @@ class JsonDatabaseManager implements DatabaseManager
 
         $id = count($personIds) > 0 ? max($personIds) + 1 : 1;
 
-        $personToPersist = $this->mapPersonToDbArray($person, $id);
-        $personLanguagesToPersist = $this->mapPersonLanguagesToDbArray($person, $existingLanguages);
+        $personToPersist = $this->mapPersonToDbType($person, $id);
+        $personLanguagesToPersist = $this->mapPersonLanguagesToDbType($person, $existingLanguages);
 
         $personLanguages[] = [
             'personId' => $id,
@@ -145,23 +191,19 @@ class JsonDatabaseManager implements DatabaseManager
 
     private function persistLanguage(Language $language)
     {
-        $db = $this->getDatabase();
-        $languages = $db['language'];
         if ($this->languageExists($language)) {
             throw new LanguageAlreadyExists();
         }
+
+        $db = $this->getDatabase();
+        $languages = $db['language'];
         $languages[] = ['name' => $language->getName()];
 
         $db['language'] = $languages;
         $this->updateDb($db);
     }
 
-    private function updateDb($updatedDb)
-    {
-        file_put_contents(Parameters::DB_PATH, json_encode($updatedDb));
-    }
-
-    private function mapPersonToDbArray(Person $person, $id)
+    private function mapPersonToDbType(Person $person, $id)
     {
         $reflectionClass = new \ReflectionClass(Person::class);
         $reflectionFirstName = $reflectionClass->getProperty('firstName');
@@ -176,7 +218,7 @@ class JsonDatabaseManager implements DatabaseManager
         ];
     }
 
-    private function mapPersonLanguagesToDbArray(Person $person, &$existingLanguages)
+    private function mapPersonLanguagesToDbType(Person $person, &$existingLanguages)
     {
         $personLanguagesToPersist = [];
 
@@ -233,5 +275,108 @@ class JsonDatabaseManager implements DatabaseManager
         }
 
         return false;
+    }
+
+    /**
+     * @param array $persons
+     * @param array $personsLanguages
+     * @return array
+     */
+    private function createPersonsFromDbType(array $persons, array $personsLanguages)
+    {
+        $result = [];
+        $personLanguages = [];
+
+        foreach ($personsLanguages as $personLanguage) {
+            $personLanguages[$personLanguage['personId']] = $personLanguage['languages'];
+        }
+
+        foreach ($persons as $person) {
+            $id = $person['id'];
+
+            $personEntity = new Person($person['firstName'], $person['lastName'], $personLanguages[$id]);
+            $reflectionClass = new \ReflectionClass(Person::class);
+            $reflectionProperty = $reflectionClass->getProperty('id');
+            $reflectionProperty->setAccessible(true);
+            $reflectionProperty->setValue($personEntity, $id);
+
+            $result[] = $personEntity;
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param array $languages
+     * @return array
+     */
+    private function createLanguagesFromDbType(array $languages)
+    {
+        $result = [];
+
+        foreach ($languages as $language) {
+            $result[] = new Language($language['name']);
+        }
+
+        return $result;
+    }
+
+    private function filterResult(array $items, array $filters, bool $caseSensitive = true)
+    {
+        $result = [];
+
+        foreach ($filters as $fieldName => $value) {
+            foreach ($items as $key=> $item) {
+                $reflectionClass = new \ReflectionClass($item);
+                $reflectionProperty = $reflectionClass->getProperty($fieldName);
+                $reflectionProperty->setAccessible(true);
+
+                $propertyValue = $reflectionProperty->getValue($item);
+
+                if (is_string($value) && ($caseSensitive === false)) {
+                    $condition = (strtolower($propertyValue) === strtolower($value));
+
+                } else {
+                    $condition = ($propertyValue === $value);
+                }
+
+                if ($condition) {
+                    $result[] = $item;
+                }
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * Returns whole database as array
+     *
+     * @return array
+     */
+    private function getDatabase()
+    {
+        return json_decode(file_get_contents(Parameters::DB_PATH), true);
+    }
+
+    /**
+     * Updates whole database
+     *
+     * @param $updatedDb
+     */
+    private function updateDb($updatedDb)
+    {
+        file_put_contents(Parameters::DB_PATH, json_encode($updatedDb));
+    }
+
+    /**
+     * Returns table with the given name
+     *
+     * @param string $tableName
+     * @return array
+     */
+    private function getTableContest(string $tableName)
+    {
+        return $this->getDatabase()[$tableName];
     }
 }

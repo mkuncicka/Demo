@@ -56,7 +56,7 @@ class Validator
             throw new ValidationException("Value must be type of string.");
         }
 
-        if (preg_match("^[A-z]+$", $argument) === 0) {
+        if (preg_match("/^[A-z]+$/", $argument) === 0) {
             throw new ValidationException("Value must by alphabetical - only letters allowed.");
         }
 

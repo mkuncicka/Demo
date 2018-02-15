@@ -20,10 +20,19 @@ interface Languages
     public function add(Language $language);
 
     /**
-     * Removes language identified by given name
+     * Removes language from repository
      *
      * @param Language $language
      * @return void
      */
     public function remove(Language $language);
+
+    /**
+     * Returns language identified by given name
+     *
+     * @param string $name
+     * @return Language
+     */
+    public function getByName(string $name);
+
 }
