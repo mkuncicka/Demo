@@ -27,12 +27,17 @@ class CommandHandler
      * @var Languages
      */
     private $languages;
+    /**
+     * @var Validator
+     */
+    private $validator;
 
-    public function __construct(DatabaseManager $databaseManager, Persons $persons, Languages $languages)
+    public function __construct(DatabaseManager $databaseManager, Persons $persons, Languages $languages, Validator $validator)
     {
         $this->databaseManager = $databaseManager;
         $this->persons = $persons;
         $this->languages = $languages;
+        $this->validator = $validator;
     }
 
     /**
@@ -54,9 +59,10 @@ class CommandHandler
      */
     public function find($args)
     {
-        if (count($args) == 0) {
-            print "Part of the full name not passed\n";
-            exit;
+        $this->validator->notAnEmptyArray($args);
+
+        foreach ($args as $namePart) {
+            $this->validator->isAlphabetical($namePart);
         }
 
         $name = implode( ' ', $args);
@@ -73,6 +79,8 @@ class CommandHandler
      */
     public function languages($args)
     {
+        $this->validator->notAnEmptyArray($args);
+
         foreach ($this->persons->getByLanguages($args) as $person) {
             print $person;
         }
@@ -85,12 +93,22 @@ class CommandHandler
      */
     public function addPerson($args)
     {
+        $this->validator->hasMinimumNumberOfElements($args, 2);
+
+        $firstName = $args[0];
+        $lastName = $args[1];
+        $languageNames = array_splice($args, 2);
+
+        $this->validator->isAlphabetical($firstName);
+        $this->validator->isAlphabetical($lastName);
+
         $languages = [];
-        foreach (array_splice($args, 2) as $languageName) {
+
+        foreach ($languageNames as $languageName) {
             $languages[] = new Language($languageName);
         }
 
-        $person = new Person($args[0], $args[1], $languages);
+        $person = new Person($firstName, $lastName, $languages);
         $this->persons->add($person);
 
         print "Person addition succeed\n";
@@ -103,7 +121,12 @@ class CommandHandler
      */
     public function addLanguage($args)
     {
-        $language = new Language($args[0]);
+        $this->validator->notAnEmptyArray($args);
+
+        $languageName = $args[0];
+        $this->validator->isNotEmptyString($languageName);
+
+        $language = new Language($languageName);
         $this->languages->add($language);
 
         print "Language addition succeed\n";

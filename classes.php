@@ -14,3 +14,4 @@ require_once "src/Repository/Persons.php";
 require_once "src/Repository/PersonsRepository.php";
 require_once "src/Application/Application.php";
 require_once "src/Application/CommandHandler.php";
+require_once "src/Application/Validator.php";
