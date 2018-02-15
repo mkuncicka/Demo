@@ -33,4 +33,15 @@ class LanguagesRepository implements Languages
     {
         $this->databaseManager->persist($language);
     }
+
+    /**
+     * Removes language from repository
+     *
+     * @param Language $language
+     * @return void
+     */
+    public function remove(Language $language)
+    {
+        $this->databaseManager->removeLanguage($language);
+    }
 }

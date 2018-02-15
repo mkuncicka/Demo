@@ -2,6 +2,8 @@
 
 namespace Demo\Database;
 
+use Demo\Model\Language;
+
 /**
  * Describes database manager implementation
  *
@@ -27,10 +29,18 @@ interface DatabaseManager
 
     /**
      * Removes person identified by given id
-     * 
+     *
      * @param $id
      * @return void
      */
     public function removePerson($id);
+
+    /**
+     * Removes language identified by given name
+     *
+     * @param Language $language
+     * @return void
+     */
+    public function removeLanguage(Language $language);
 
 }

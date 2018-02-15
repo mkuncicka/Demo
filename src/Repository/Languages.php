@@ -18,4 +18,12 @@ interface Languages
      * @return void
      */
     public function add(Language $language);
+
+    /**
+     * Removes language identified by given name
+     *
+     * @param Language $language
+     * @return void
+     */
+    public function remove(Language $language);
 }

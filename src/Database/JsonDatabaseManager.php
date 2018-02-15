@@ -58,13 +58,46 @@ class JsonDatabaseManager implements DatabaseManager
                 $db['person'] = array_splice($persons, $personKey, 1);
                 foreach ($personLanguages as $languageKey=>$personLanguage) {
                     if ($personLanguage['personId'] === (int) $id) {
-                        $db['person_language'] = array_slice($personLanguages, $languageKey, 1);
+                        $db['person_language'] = array_splice($personLanguages, $languageKey, 1);
                     }
                 }
             }
         }
 
         $this->updateDb($persons);
+    }
+
+    /**
+     * Removes language identified by given name
+     *
+     * @param Language $language
+     * @return mixed
+     * @throws LanguageNotFound
+     * @throws LanguageUsed
+     */
+    public function removeLanguage(Language $language)
+    {
+        if ($this->languageExists($language) === false) {
+            throw new LanguageNotFound();
+        }
+
+        if ($this->isLanguageKnownByAnyone($language) === true) {
+            throw new LanguageUsed();
+        }
+
+        $db = $this->getDatabase();
+
+        $existingLanguages = $db['language'];
+
+        foreach ($existingLanguages as $key=>$existingLanguage) {
+            if ($existingLanguage['name'] === $language->getName()) {
+                array_splice($existingLanguages, $key, 1);
+                break;
+            }
+        }
+        $db['language'] = $existingLanguages;
+
+        $this->updateDb($db);
     }
 
     private function getDatabase()
@@ -176,6 +209,25 @@ class JsonDatabaseManager implements DatabaseManager
         $existingLanguages = $this->getDatabase()['language'];
         foreach ($existingLanguages as $existingLanguage) {
             if (strtolower($language->getName()) === strtolower($existingLanguage['name'])) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Checks if anyone know given language
+     *
+     * @param Language $language
+     * @return bool
+     */
+    private function isLanguageKnownByAnyone(Language $language)
+    {
+        $personLanguages = $this->getDatabase()['person_language'];
+        foreach ($personLanguages as $personLanguage) {
+            $mappedLanguages = array_map(function($language){return strtolower($language);},$personLanguage['languages']);
+            if (in_array(strtolower($language->getName()), $mappedLanguages)) {
                 return true;
             }
         }

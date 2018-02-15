@@ -3,14 +3,14 @@
 namespace Demo\Database;
 
 /**
- * Exception is thrown when language already exists
+ * Exception is thrown when language can not be find
  *
  * @author Magdalena Kuncicka <mkuncicka@gmail.com>
  */
-class LanguageAlreadyExists extends \Exception
+class LanguageNotFound extends \Exception
 {
     public function __construct(
-        $message = "Language you tried to add already exist",
+        $message = "Language you tried to remove doesn't exists",
         $code = 0,
         \Throwable $previous = null)
     {

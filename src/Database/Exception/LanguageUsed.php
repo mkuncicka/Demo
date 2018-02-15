@@ -7,10 +7,10 @@ namespace Demo\Database;
  *
  * @author Magdalena Kuncicka <mkuncicka@gmail.com>
  */
-class LanguageAlreadyExists extends \Exception
+class LanguageUsed extends \Exception
 {
     public function __construct(
-        $message = "Language you tried to add already exist",
+        $message = "Language you tried to deleted is in use - check relations id database",
         $code = 0,
         \Throwable $previous = null)
     {
